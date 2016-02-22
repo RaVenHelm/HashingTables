@@ -91,8 +91,9 @@ class HashTable:
 		else:
 			return index + 1
 
-	def search_by_id(self, id):
-		self.calculate_index(id)
+	def search_by_id(self, sid):
+		self.searches += 1
+		self.calculate_index(sid)
 
 	def get_input(self):
 		Utility.get_user_input(self)
