@@ -44,9 +44,22 @@ class Utility:
 		table.insert_value(data)
 
 	@staticmethod
+	def get_user_search_input(table):
+		print('Search #n:')
+		print('    Enter ID:    ', end='')
+		input_id = input()
+		table.search_by_id(input_id)
+
+	@staticmethod
 	def print_table_complete(table):
 		fmt_string = 'Table complete. {} records in {} spaces, with {} collisions'\
 			.format(table.records, table.size, table.collisions)
+		print(fmt_string)
+
+	@staticmethod
+	def print_search_summary(table):
+		fmt_string = 'Summary: Performed {} searches, requiring {} probes, for an average of {} probes per search.'\
+			.format(table.searches, table.probes, table.probes/table.searches)
 		print(fmt_string)
 
 
@@ -57,6 +70,8 @@ class HashTable:
 		self.values = [None] * self.size
 		self.records = 0
 		self.collisions = 0
+		self.probes = 0
+		self.searches = 0
 		self.print = to_print
 		self.print_table()
 		self.get_input()
@@ -75,6 +90,9 @@ class HashTable:
 			return 0
 		else:
 			return index + 1
+
+	def search_by_id(self, id):
+		self.calculate_index(id)
 
 	def get_input(self):
 		Utility.get_user_input(self)
@@ -112,6 +130,40 @@ class HashTable:
 			fmt_is_empty = '(empty)'
 			print(fmt_is_empty.rjust(len(fmt_is_empty) + 2))
 			return hash_index, orig_hash_index
+
+	def calculate_index(self, value):
+		string = str(value)
+		hash_index = int(string[len(string)-2:len(string)])
+		orig_hash_index = hash_index
+		while self.values[hash_index] is not None:
+			fmt_string = 'Calculated index:'
+			print(fmt_string.rjust(len(fmt_string) + 4), end='')
+			print('{}'.format(hash_index).rjust(4), end='')
+			self.probes += 1
+
+			if self.values[hash_index]['ID'] != value:
+				fmt_is_not_empty = '({}, {})'
+				fmt_is_not_empty = fmt_is_not_empty.format(self.collisions, self.values[hash_index])
+				print(fmt_is_not_empty.rjust(len(fmt_is_not_empty) + 2))
+				hash_index = self.hash(hash_index)
+			else:
+				fmt_string = 'Calculated index:'
+				print(fmt_string.rjust(len(fmt_string) + 4), end='')
+				print('{}'.format(hash_index).rjust(4), end='')
+				print('Found at index {}.'.format(hash_index))
+				break
+		else:
+			fmt_string = 'Calculated index:'
+			print(fmt_string.rjust(len(fmt_string) + 4), end='')
+			print('{}'.format(hash_index).rjust(4), end='')
+			self.probes += 1
+			fmt_is_empty = '(empty)'
+			print(fmt_is_empty.rjust(len(fmt_is_empty) + 2))
+			print('Not in table')
+			print('Required {} probes.'.format(self.probes))
+			return hash_index, orig_hash_index
+		print('Required {} probes.'.format(self.probes))
+		return hash_index, orig_hash_index
 
 	def insert_value(self, value):
 		# Utility.print_type_val(value)
