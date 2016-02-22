@@ -98,11 +98,17 @@ class HashTable:
 	def get_input(self):
 		Utility.get_user_input(self)
 
+	def search(self):
+		Utility.get_user_search_input(self)
+
 	def print_table(self):
 		Utility.print_current_table(self)
 
 	def end(self):
 		Utility.print_table_complete(self)
+
+	def end_search(self):
+		Utility.print_search_summary(self)
 
 	# Linear Searching will be the default hash table algorithm
 	# Override for custom
@@ -182,11 +188,10 @@ class LinearHashTable(HashTable):
 
 	def __init__(self, to_print=True):
 		HashTable.__init__(self, to_print)
-		self.end()
+		self.search()
 
 
 class CustomHashTable(HashTable):
 
 	def __init__(self, to_print=True):
 		HashTable.__init__(self, to_print)
-		self.end()

@@ -10,11 +10,7 @@ def make_data(**kwargs):
 def main(arguments):
 	l = LinearHashTable()
 
-	# string = '31415'
-	# l.insert_value(make_data(id=string, name='Jimbo'))
-	#
-	# l.insert_value(make_data(id='76666', name='Danni'))
-	# l.insert_value(make_data(id=10015, name='Sally'))
+	l.end_search()
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='Tester for Assignment #6')
