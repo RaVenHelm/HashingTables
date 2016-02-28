@@ -8,8 +8,8 @@ def make_data(**kwargs):
 
 
 def main(arguments):
-	l = LinearHashTable()
-
+	# l = LinearHashTable()
+	c = CustomHashTable()
 	# string = '31415'
 	# l.insert_value(make_data(id=string, name='Jimbo'))
 	#

@@ -34,8 +34,7 @@ class Utility:
 
 	@staticmethod
 	def get_user_input(table):
-		# signal.signal(signal.SIGINT, Utility.capture_ctrl_c)
-		print('Enter Record:')
+		print('Enter Record {}:'.format(table.records + 1))
 		print('    Name:    ', end='')
 		input_name = input()
 		print('    ID:      ', end='')
@@ -45,7 +44,8 @@ class Utility:
 
 	@staticmethod
 	def get_user_search_input(table):
-		print('Search #n:')
+		table.searches += 1
+		print('Search #{}:'.format(table.searches))
 		print('    Enter ID:    ', end='')
 		input_id = input()
 		table.search_by_id(input_id)
@@ -62,6 +62,10 @@ class Utility:
 			.format(table.searches, table.probes, table.probes/table.searches)
 		print(fmt_string)
 
+	@staticmethod
+	def value_to_string(value):
+		return '{},{}'.format(value['NAME'], value['ID'])
+
 
 class HashTable:
 
@@ -72,9 +76,17 @@ class HashTable:
 		self.collisions = 0
 		self.probes = 0
 		self.searches = 0
+		# Filled entries/Size
+		self.saturation = 0.0
 		self.print = to_print
+		print('#' * 20, ' ', '-->', ' ', 'Building the Table', ' ', '<--', ' ', '#' * 20)
 		self.print_table()
-		self.get_input()
+		while self.saturation < 3.0:
+			self.get_input()
+			self.saturation = 100 * (self.records/self.size)
+		Utility.print_table_complete(self)
+		print('#' * 20, ' ', '-->', ' ', 'Searching the Table', ' ', '<--', ' ', '#' * 20)
+		self.get_search_input()
 
 	def insert_value(self, value):
 		for i in range(len(self.values)):
@@ -83,7 +95,7 @@ class HashTable:
 				self.values[i] = value
 				return
 
-	# Linear Searching will be the default hash table algorithm
+	# Linear Hashing will be the default hash table algorithm
 	# Override for custom
 	def hash(self, index):
 		if index >= max_index(self.values):
@@ -97,11 +109,14 @@ class HashTable:
 	def get_input(self):
 		Utility.get_user_input(self)
 
+	def get_search_input(self):
+		Utility.get_user_search_input(self)
+
 	def print_table(self):
 		Utility.print_current_table(self)
 
 	def end(self):
-		Utility.print_table_complete(self)
+		Utility.print_search_summary(self)
 
 	# Linear Searching will be the default hash table algorithm
 	# Override for custom
@@ -120,7 +135,7 @@ class HashTable:
 			print('{}'.format(hash_index).rjust(4), end='')
 			self.collisions += 1
 			fmt_is_not_empty = '(Collision #{} - {})'
-			fmt_is_not_empty = fmt_is_not_empty.format(self.collisions, self.values[hash_index])
+			fmt_is_not_empty = fmt_is_not_empty.format(self.collisions, Utility.value_to_string(self.values[hash_index]))
 			print(fmt_is_not_empty.rjust(len(fmt_is_not_empty) + 2))
 			hash_index = self.hash(hash_index)
 		else:
@@ -143,7 +158,7 @@ class HashTable:
 
 			if self.values[hash_index]['ID'] != value:
 				fmt_is_not_empty = '({}, {})'
-				fmt_is_not_empty = fmt_is_not_empty.format(self.collisions, self.values[hash_index])
+				fmt_is_not_empty = fmt_is_not_empty.format(self.collisions, self.values[hash_index].name)
 				print(fmt_is_not_empty.rjust(len(fmt_is_not_empty) + 2))
 				hash_index = self.hash(hash_index)
 			else:
@@ -178,8 +193,11 @@ class HashTable:
 
 
 class LinearHashTable(HashTable):
-
 	def __init__(self, to_print=True):
+		if to_print:
+			print('#' * 32)
+			print('Hash Algoirthm #1 - Linear')
+			print('#' * 32)
 		HashTable.__init__(self, to_print)
 		self.end()
 
@@ -189,3 +207,10 @@ class CustomHashTable(HashTable):
 	def __init__(self, to_print=True):
 		HashTable.__init__(self, to_print)
 		self.end()
+
+	# Jump K Method, just cause it's easier
+	def hash(self, index):
+		if index >= max_index(self.values):
+			return 0
+		else:
+			return index + 5
