@@ -205,6 +205,10 @@ class LinearHashTable(HashTable):
 class CustomHashTable(HashTable):
 
 	def __init__(self, to_print=True):
+		if to_print:
+			print('#' * 32)
+			print('Hash Algoirthm #2 - Jump-K')
+			print('#' * 32)
 		HashTable.__init__(self, to_print)
 		self.end()
 
