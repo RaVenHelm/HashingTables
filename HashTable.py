@@ -162,10 +162,10 @@ class HashTable:
 				print(fmt_is_not_empty.rjust(len(fmt_is_not_empty) + 2))
 				hash_index = self.hash(hash_index)
 			else:
-				fmt_string = 'Calculated index:'
-				print(fmt_string.rjust(len(fmt_string) + 4), end='')
-				print('{}'.format(hash_index).rjust(4), end='')
-				print('Found at index {}.'.format(hash_index))
+				# fmt_string = 'Calculated index:'
+				# print(fmt_string.rjust(len(fmt_string) + 4), end='')
+				# print('{}'.format(hash_index).rjust(4), end='')
+				# print('Found at index {}.'.format(hash_index))
 				break
 		else:
 			fmt_string = 'Calculated index:'
