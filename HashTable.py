@@ -1,7 +1,12 @@
-from random import randrange
+from random import randrange, sample
+
+import sys
 
 def max_index(array):
     return len(array) - 1
+
+def last(array):
+    return array[len(array) - 1]
 
 
 class Utility:
@@ -39,6 +44,26 @@ class Utility:
     def create_found_records_list(table):
         values = [x for x in table.values if x is not None]
         records = [v['ID'] for v in values]
+        if len(records) <= 10:
+            _last = last(records)
+            remaining = 10 - len(records)
+            # replicate last record until list is filled
+            [records.append(_last) for i in range(remaining)]
+            return records
+        else:
+            return sample(records, 10)
+
+    @staticmethod
+    def create_not_found_records_list(table):
+        values = [x for x in table.values if x is not None]
+        ids = [v['ID'] for v in values]
+        records = []
+        while len(records) < 10:
+            r = randrange(100000, 1000000)
+            if r in ids:
+                continue
+            else:
+                records.append(r)
         return records
 
     @staticmethod
@@ -144,7 +169,7 @@ class HashTable:
             return index + 1
 
     def search_by_id(self, id):
-        self.calculate_index(id)
+        return self.calculate_index(id)[2]
 
     def get_input(self):
         if self.to_print:
@@ -157,6 +182,7 @@ class HashTable:
     def print_table(self):
         if self.to_print:
             Utility.print_current_table(self)
+
     def reset(self):
         self.size = 100
         self.values = [None] * self.size
@@ -205,13 +231,16 @@ class HashTable:
         string = str(value)
         hash_index = int(string[len(string) - 2:len(string)])
         orig_hash_index = hash_index
-        while self.values[hash_index] is not None:
+        required_probes = 1
+        i = 0
+        while self.values[hash_index] is not None and required_probes < self.size:
             if self.to_print:
                 fmt_string = 'Calculated index:'
                 print(fmt_string.rjust(len(fmt_string) + 4), end='')
                 print('{}'.format(hash_index).rjust(4), end='')
 
             self.probes += 1
+            required_probes += 1
 
             if self.values[hash_index]['ID'] != value:
                 if self.to_print:
@@ -220,31 +249,27 @@ class HashTable:
                     print(fmt_is_not_empty.rjust(len(fmt_is_not_empty) + 2))
 
                 hash_index = self.hash(hash_index)
+                
+                
             else:
-                # fmt_string = 'Calculated index:'
-                # print(fmt_string.rjust(len(fmt_string) + 4), end='')
-                # print('{}'.format(hash_index).rjust(4), end='')
-                # print('Found at index {}.'.format(hash_index))
-                break
+                return hash_index, orig_hash_index, required_probes
         else:
             if self.to_print:
                 fmt_string = 'Calculated index:'
                 print(fmt_string.rjust(len(fmt_string) + 4), end='')
                 print('{}'.format(hash_index).rjust(4), end='')
 
-            self.probes += 1
-
             if self.to_print:
                 fmt_is_empty = '(empty)'
                 print(fmt_is_empty.rjust(len(fmt_is_empty) + 2))
                 print('Not in table')
                 print('Required {} probes.'.format(self.probes))
-            return hash_index, orig_hash_index
+            return hash_index, orig_hash_index, required_probes
 
         if self.to_print:
             print('Required {} probes.'.format(self.probes))
 
-        return hash_index, orig_hash_index
+        return hash_index, orig_hash_index, required_probes
 
     def insert_value(self, value):
         hash_index, orig = self.get_hash_index(value)

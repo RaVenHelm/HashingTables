@@ -23,16 +23,25 @@ class HashTableAnalysis(object):
 
     def run_test(self):
         records = Utility.create_random_records_list(100) # Random records for population
-        found_records = Utility.create_found_records_list(self.table)
-        not_found_records = []
         for i,r in enumerate(records):
             if self.table.saturation >= 100.0:
                 break
-            found_records = Utility.create_found_records_list(self.table)
-            if i <= 5:
-                print(found_records)
+            fmt_string = '{}\t{}\t{}\{}'
             data = Utility.make_data_dictionary(id=r)
             self.table.insert_value(data)
+            found_records = Utility.create_found_records_list(self.table)
+            not_found_records = Utility.create_not_found_records_list(self.table)
+
+            # search through found records
+            # for id in found_records:
+            #     self.table.search_by_id(id)
+
+            # search through not found records
+            l = []
+            for id in not_found_records:
+                l.append(self.table.search_by_id(id))
+            print(l)
+
         # print(self.table.collisions)
 
 
