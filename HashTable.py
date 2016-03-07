@@ -205,6 +205,7 @@ class HashTable:
 
         hash_index = int(string[len(string) - 2:len(string)])
         orig_hash_index = hash_index
+        collisions_required = 0
 
         while self.values[hash_index] is not None:
             if self.to_print:
@@ -212,6 +213,7 @@ class HashTable:
                 print(fmt_string.rjust(len(fmt_string) + 4), end='')
                 print('{}'.format(hash_index).rjust(4), end='')
             self.collisions += 1
+            collisions_required += 1
             if self.to_print:
                 fmt_is_not_empty = '(Collision #{} - {})'
                 fmt_is_not_empty = fmt_is_not_empty.format(self.collisions, Utility.value_to_string(self.values[hash_index]))
@@ -224,7 +226,7 @@ class HashTable:
                 print('{}'.format(hash_index).rjust(4), end='')
                 fmt_is_empty = '(empty)'
                 print(fmt_is_empty.rjust(len(fmt_is_empty) + 2))
-            return hash_index, orig_hash_index
+            return hash_index, orig_hash_index, collisions_required
 
     # This is for searching
     def calculate_index(self, value):
@@ -259,6 +261,9 @@ class HashTable:
                 print(fmt_string.rjust(len(fmt_string) + 4), end='')
                 print('{}'.format(hash_index).rjust(4), end='')
 
+            self.probes += 1
+            required_probes += 1
+            
             if self.to_print:
                 fmt_is_empty = '(empty)'
                 print(fmt_is_empty.rjust(len(fmt_is_empty) + 2))
@@ -272,7 +277,7 @@ class HashTable:
         return hash_index, orig_hash_index, required_probes
 
     def insert_value(self, value):
-        hash_index, orig = self.get_hash_index(value)
+        hash_index, orig, collisions_required = self.get_hash_index(value)
         self.values[hash_index] = value
         self.records += 1
         self.saturation = 100 * (self.records / self.size)
@@ -282,6 +287,7 @@ class HashTable:
             print()
             self.print_table()
             print()
+        return collisions_required
 
 
 class LinearHashTable(HashTable):

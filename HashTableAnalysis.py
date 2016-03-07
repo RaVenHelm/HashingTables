@@ -7,8 +7,13 @@ class HashTableAnalysis(object):
     def __init__(self, table, runs=10):
         self.table = table
         self.test_runs = runs
-        self.record_count = list(range(1,101))
-        self.totals = [{'collisions':0.0, 'found':0.0, 'notfound': 0.0}] * 100
+        self.record_count = list(range(1,self.table.size + 1))
+        self.total_collisions = [0.0] * self.table.size
+        self.total_found = [0.0] * self.table.size
+        self.total_not_found = [0.0] * self.table.size
+        self.average_collisions = [0.0] * self.table.size
+        self.average_found = [0.0] * self.table.size
+        self.average_not_found = [0.0] * self.table.size
         self.do_runs()
         
     def do_runs(self):
@@ -18,32 +23,58 @@ class HashTableAnalysis(object):
             print('#RECORDS\tCOLLISIONS\tFOUND PROBES\tNOT-FOUND PROBES')
             self.run_test()
             self.table.reset()
+
+            for i in range(self.table.size):
+                self.average_collisions[i] += self.total_collisions[i] / (self.test_runs)
+                self.average_found[i] += self.total_found[i] / (self.test_runs)
+                self.average_not_found[i] += self.total_not_found[i] / (self.test_runs)
+
+            self.reset()
+            # print(self.average_collisions)
             print()
+        print()
+        self.print_averages()
+
+    def reset(self):
+        self.total_collisions = [0.0] * self.table.size
+        self.total_found = [0.0] * self.table.size
+        self.total_not_found = [0.0] * self.table.size
+
+    def print_averages(self):
         print('-----> Overall Average')
+        print()
+        print('#RECORDS\tCOLLISIONS\tFOUND PROBES\tNOT-FOUND PROBES')
+        for i in range(self.table.size):
+            fmt_string = '{}\t{:1}\t{:2}\t{:2}'
+            res = fmt_string.format(i + 1, self.average_collisions[i], self.average_found[i], self.average_not_found[i])
+            print(res)
+        print()
 
     def run_test(self):
-        records = Utility.create_random_records_list(100) # Random records for population
+        records = Utility.create_random_records_list(self.table.size) # Random records for population
         for i,r in enumerate(records):
-            if self.table.saturation >= 100.0:
-                break
-            fmt_string = '{}\t{}\t{}\{}'
+            fmt_string = '{}\t{}\t{}\t{}'
             data = Utility.make_data_dictionary(id=r)
-            self.table.insert_value(data)
+            collisions_required = self.table.insert_value(data)
             found_records = Utility.create_found_records_list(self.table)
             not_found_records = Utility.create_not_found_records_list(self.table)
 
             # search through found records
-            # for id in found_records:
-            #     self.table.search_by_id(id)
+            found_probes = [self.table.search_by_id(id) for id in found_records]
+            found_avg = sum(found_probes) / len(found_probes)
 
             # search through not found records
-            l = []
-            for id in not_found_records:
-                l.append(self.table.search_by_id(id))
-            print(l)
+            not_found_probes = [self.table.search_by_id(id) for id in not_found_records]
+            not_found_avg = sum(not_found_probes) / len(not_found_probes)
 
-        # print(self.table.collisions)
-
+            
+            # place results into running totals
+            self.total_collisions[i] = collisions_required
+            self.total_found[i] = found_avg
+            self.total_not_found[i] = not_found_avg
+            res = fmt_string.format(i + 1, collisions_required, found_avg, not_found_avg)
+            print(res)
+        
 
 def main():
     l = LinearHashTable(to_print=False)
