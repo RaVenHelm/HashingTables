@@ -207,7 +207,7 @@ class HashTable:
         orig_hash_index = hash_index
         collisions_required = 0
 
-        while self.values[hash_index] is not None:
+        while self.values[hash_index] is not None and collisions_required < self.size:
             if self.to_print:
                 fmt_string = 'Calculating hashing index:'
                 print(fmt_string.rjust(len(fmt_string) + 4), end='')
@@ -235,6 +235,8 @@ class HashTable:
         orig_hash_index = hash_index
         required_probes = 1
         i = 0
+
+
         while self.values[hash_index] is not None and required_probes < self.size:
             if self.to_print:
                 fmt_string = 'Calculated index:'
@@ -251,8 +253,6 @@ class HashTable:
                     print(fmt_is_not_empty.rjust(len(fmt_is_not_empty) + 2))
 
                 hash_index = self.hash(hash_index)
-                
-                
             else:
                 return hash_index, orig_hash_index, required_probes
         else:
@@ -262,8 +262,8 @@ class HashTable:
                 print('{}'.format(hash_index).rjust(4), end='')
 
             self.probes += 1
-            required_probes += 1
-            
+            # required_probes += 1
+
             if self.to_print:
                 fmt_is_empty = '(empty)'
                 print(fmt_is_empty.rjust(len(fmt_is_empty) + 2))
@@ -314,8 +314,13 @@ class CustomHashTable(HashTable):
         self.end()
 
     # Jump K Method, just cause it's easier
+    # K = 5
     def hash(self, index):
-        if index >= max_index(self.values):
-            return 0
+        imax = max_index(self.values)
+        if index >= imax:
+            return imax - index
         else:
-            return index + 5
+            if index + 5 > imax:
+                return imax - index # return remainder (mod)
+            else:
+                return index + 5

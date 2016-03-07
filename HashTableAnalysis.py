@@ -45,7 +45,7 @@ class HashTableAnalysis(object):
         print()
         print('#RECORDS\tCOLLISIONS\tFOUND PROBES\tNOT-FOUND PROBES')
         for i in range(self.table.size):
-            fmt_string = '{}\t{:1}\t{:2}\t{:2}'
+            fmt_string = '{}\t{:.1f}\t{:.2f}\t{:.2f}'
             res = fmt_string.format(i + 1, self.average_collisions[i], self.average_found[i], self.average_not_found[i])
             print(res)
         print()
@@ -53,7 +53,7 @@ class HashTableAnalysis(object):
     def run_test(self):
         records = Utility.create_random_records_list(self.table.size) # Random records for population
         for i,r in enumerate(records):
-            fmt_string = '{}\t{}\t{}\t{}'
+            fmt_string = '{}\t{}\t{:.2f}\t{:.2f}'
             data = Utility.make_data_dictionary(id=r)
             collisions_required = self.table.insert_value(data)
             found_records = Utility.create_found_records_list(self.table)
@@ -86,10 +86,10 @@ def main():
     print()
     HashTableAnalysis(l)
 
-    # print('*' * 50)
-    # print('Jump - K Analysis')
-    # print('*' * 50)
-    # HashTableAnalysis(c)
+    print('*' * 50)
+    print('Jump - K Analysis')
+    print('*' * 50)
+    HashTableAnalysis(c)
 
     
 
